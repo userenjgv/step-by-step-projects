@@ -10,10 +10,21 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase environment variables are missing. Please check your .env file or set them in your environment.');
 }
 
+// Configure storage for native mobile apps as well as web
+const supabaseOptions = {
+  auth: {
+    storage: localStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  }
+};
+
 // Create a single supabase client for the entire application with fallback empty strings
 const supabase = createClient(
   supabaseUrl || 'https://placeholder-url.supabase.co', 
-  supabaseAnonKey || 'placeholder-key'
+  supabaseAnonKey || 'placeholder-key',
+  supabaseOptions
 );
 
 export default supabase;
