@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -161,6 +160,9 @@ const ProjectDetail = () => {
     return PROGRESS_STEPS.find((s) => s.id === stepId);
   };
 
+  const completedSteps = project?.steps.filter(step => step.completed).length || 0;
+  const totalSteps = project?.steps.length || 0;
+
   if (isLoading) {
     return (
       <Layout
@@ -214,10 +216,10 @@ const ProjectDetail = () => {
             </div>
             <div>
               <span className="font-medium">
-                {project.steps.filter((s) => s.completed).length}
+                {completedSteps}
               </span>{" "}
               of{" "}
-              <span className="font-medium">{project.steps.length}</span> steps
+              <span className="font-medium">{totalSteps}</span> steps
               completed
             </div>
           </div>
@@ -226,13 +228,21 @@ const ProjectDetail = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
-              <span>Progress</span>
-              <span className="text-blue-600">
-                {Math.round(project.progress)}%
-              </span>
+              <span>Project Status</span>
+              <div className="flex items-center">
+                <span className={cn(
+                  "px-3 py-1 rounded-full text-sm font-medium",
+                  completedSteps === totalSteps 
+                    ? "bg-green-100 text-green-800"
+                    : "bg-amber-100 text-amber-800"
+                )}>
+                  {completedSteps === totalSteps ? "Completed" : "In Progress"}
+                </span>
+              </div>
             </CardTitle>
-            <CardDescription>Project completion status</CardDescription>
-            <Progress value={project.progress} className="h-2" />
+            <CardDescription>
+              {completedSteps} of {totalSteps} steps completed
+            </CardDescription>
           </CardHeader>
         </Card>
 
@@ -263,9 +273,13 @@ const ProjectDetail = () => {
                       <div>
                         <h3 className="font-medium flex items-center">
                           {index + 1}. {progressStep.title}{" "}
-                          {step?.completed && (
+                          {step?.completed ? (
                             <span className="ml-2 text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">
                               Completed
+                            </span>
+                          ) : (
+                            <span className="ml-2 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+                              Pending
                             </span>
                           )}
                         </h3>
@@ -296,21 +310,19 @@ const ProjectDetail = () => {
                           >
                             <Download className="h-4 w-4 mr-1" /> View
                           </Button>
-                          {isAdmin && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-red-600 border-red-200 hover:bg-red-50"
-                              onClick={() =>
-                                openDialog(progressStep.id, "delete")
-                              }
-                            >
-                              <Trash2 className="h-4 w-4 mr-1" /> Delete
-                            </Button>
-                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 border-red-200 hover:bg-red-50"
+                            onClick={() =>
+                              openDialog(progressStep.id, "delete")
+                            }
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" /> Delete
+                          </Button>
                         </>
                       )}
-                      {!step?.completed && isAdmin && (
+                      {!step?.completed && (
                         <Button
                           variant="outline"
                           size="sm"
