@@ -17,11 +17,19 @@ const setViewportForMobile = () => {
 
 const initialize = () => {
   setViewportForMobile();
-  createRoot(document.getElementById("root")!).render(<App />);
+  
+  // Get the root element and ensure it exists before rendering
+  const rootElement = document.getElementById("root");
+  if (!rootElement) {
+    console.error("Root element not found");
+    return;
+  }
+  
+  // Create root and render the app
+  createRoot(rootElement).render(<App />);
 };
 
-// Wait for the device to be ready when in native environment
-// This helps ensure plugins are ready and native app is initialized
+// Wait for the DOM to be ready
 document.addEventListener('DOMContentLoaded', () => {
   initialize();
 });
