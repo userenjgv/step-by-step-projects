@@ -5,7 +5,7 @@ import { App } from '@capacitor/app';
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  const [isMobile, setIsMobile] = React.useState<boolean>(false)
   const [isNativeMobile, setIsNativeMobile] = React.useState<boolean>(false)
 
   React.useEffect(() => {
@@ -32,5 +32,6 @@ export function useIsMobile() {
     return () => mql.removeEventListener("change", onChange)
   }, [])
 
-  return { isMobile: !!isMobile, isNativeMobile };
+  // Return just the boolean value instead of an object to match the type expected by sidebar.tsx
+  return isMobile || isNativeMobile;
 }

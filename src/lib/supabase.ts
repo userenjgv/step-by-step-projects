@@ -48,11 +48,52 @@ const supabaseOptions = {
   }
 };
 
-// Create a single supabase client for the entire application with fallback empty strings
+// Create a single supabase client for the entire application
+// If environment variables are missing, create a client with placeholder values
+// that will show proper errors in the console
 const supabase = createClient(
   supabaseUrl || 'https://placeholder-url.supabase.co', 
   supabaseAnonKey || 'placeholder-key',
   supabaseOptions
 );
+
+// Initialize the documents bucket if it doesn't exist
+const initializeStorage = async () => {
+  try {
+    // Check if the bucket exists
+    const { data: buckets, error } = await supabase.storage.listBuckets();
+    
+    if (error) {
+      console.error('Error checking storage buckets:', error);
+      return;
+    }
+
+    // If the documents bucket doesn't exist, create it
+    const documentsBucketExists = buckets?.some(bucket => bucket.name === 'documents');
+    
+    if (!documentsBucketExists) {
+      console.log('Creating documents storage bucket...');
+      const { error: createError } = await supabase.storage.createBucket('documents', {
+        public: true,
+        fileSizeLimit: 10485760, // 10MB
+      });
+      
+      if (createError) {
+        console.error('Error creating documents bucket:', createError);
+      } else {
+        console.log('Documents bucket created successfully');
+      }
+    } else {
+      console.log('Documents bucket already exists');
+    }
+  } catch (error) {
+    console.error('Error initializing storage:', error);
+  }
+};
+
+// Initialize storage if we have valid credentials
+if (supabaseUrl && supabaseAnonKey) {
+  initializeStorage();
+}
 
 export default supabase;
