@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import { App as CapacitorApp } from '@capacitor/app';
+import { App } from '@capacitor/app';
 
 const MOBILE_BREAKPOINT = 768
 
@@ -13,7 +13,7 @@ export function useIsMobile() {
     const checkPlatform = async () => {
       try {
         // This will fail with an error if not running in a Capacitor app
-        await CapacitorApp.getInfo();
+        await App.getInfo();
         setIsNativeMobile(true);
       } catch (error) {
         setIsNativeMobile(false);
