@@ -49,6 +49,11 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --sat: env(safe-area-inset-top, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
   }
 
   .dark {
@@ -97,5 +102,39 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+
+  .pt-safe-top {
+    padding-top: var(--sat);
+  }
+  
+  .pr-safe-right {
+    padding-right: var(--sar);
+  }
+  
+  .pb-safe-bottom {
+    padding-bottom: var(--sab);
+  }
+  
+  .pl-safe-left {
+    padding-left: var(--sal);
+  }
+  
+  .px-safe {
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+  }
+  
+  .py-safe {
+    padding-top: var(--sat);
+    padding-bottom: var(--sab);
+  }
+  
+  .p-safe {
+    padding: var(--sat) var(--sar) var(--sab) var(--sal);
+  }
+  
+  .min-h-screen-safe {
+    min-height: calc(100vh - var(--sat) - var(--sab));
   }
 }

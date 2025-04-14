@@ -2,6 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,10 +13,11 @@ interface LayoutProps {
 
 const Layout = ({ children, title, showBackButton, onBack }: LayoutProps) => {
   const { user, logout, isAdmin } = useAuth();
+  const isMobile = useIsMobile();
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className={`bg-white border-b border-gray-200 sticky top-0 z-10 ${isMobile ? 'pt-safe-top' : ''}`}>
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center">
             {showBackButton && (
@@ -51,7 +53,7 @@ const Layout = ({ children, title, showBackButton, onBack }: LayoutProps) => {
         </div>
       </header>
       
-      <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto">
+      <main className={`flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto ${isMobile ? 'pb-safe-bottom' : ''}`}>
         {children}
       </main>
     </div>

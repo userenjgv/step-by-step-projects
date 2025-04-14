@@ -12,7 +12,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogFooter, 
+  DialogTrigger 
+} from "@/components/ui/dialog";
+import { 
+  Drawer, 
+  DrawerContent, 
+  DrawerHeader, 
+  DrawerTitle, 
+  DrawerFooter,
+  DrawerTrigger
+} from "@/components/ui/drawer";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import { Project } from "@/lib/constants";
@@ -20,6 +35,7 @@ import { getProjects, createProject } from "@/services/projectService";
 import { Plus, Search, Calendar } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ProjectList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -35,6 +51,7 @@ const ProjectList = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     fetchProjects();
@@ -101,21 +118,73 @@ const ProjectList = () => {
     project.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const CreateProjectForm = () => (
+    <div className="space-y-4 py-2">
+      <div className="space-y-2">
+        <Label htmlFor="title">Project Title</Label>
+        <Input
+          id="title"
+          value={newProject.title}
+          onChange={(e) =>
+            setNewProject({ ...newProject, title: e.target.value })
+          }
+          placeholder="Enter project title"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={newProject.description}
+          onChange={(e) =>
+            setNewProject({
+              ...newProject,
+              description: e.target.value,
+            })
+          }
+          placeholder="Enter project description"
+          rows={4}
+        />
+      </div>
+    </div>
+  );
+  
   return (
     <Layout title="Projects">
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-auto">
+        <div className={`flex flex-col ${isMobile ? 'space-y-4' : 'sm:flex-row items-center justify-between gap-4'}`}>
+          <div className={`relative ${isMobile ? 'w-full' : 'w-full sm:w-auto'}`}>
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full sm:w-80"
+              className="pl-10 w-full"
             />
           </div>
           
-          {isAdmin && (
+          {isAdmin && isMobile ? (
+            <Drawer open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DrawerTrigger asChild>
+                <Button className="w-full">
+                  <Plus className="mr-2 h-4 w-4" /> New Project
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Create New Project</DrawerTitle>
+                </DrawerHeader>
+                <div className="px-4">
+                  <CreateProjectForm />
+                </div>
+                <DrawerFooter>
+                  <Button onClick={handleCreateProject} disabled={isCreating} className="w-full">
+                    {isCreating ? "Creating..." : "Create Project"}
+                  </Button>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+          ) : isAdmin && (
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
@@ -126,34 +195,7 @@ const ProjectList = () => {
                 <DialogHeader>
                   <DialogTitle>Create New Project</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 py-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Project Title</Label>
-                    <Input
-                      id="title"
-                      value={newProject.title}
-                      onChange={(e) =>
-                        setNewProject({ ...newProject, title: e.target.value })
-                      }
-                      placeholder="Enter project title"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={newProject.description}
-                      onChange={(e) =>
-                        setNewProject({
-                          ...newProject,
-                          description: e.target.value,
-                        })
-                      }
-                      placeholder="Enter project description"
-                      rows={4}
-                    />
-                  </div>
-                </div>
+                <CreateProjectForm />
                 <DialogFooter>
                   <Button
                     variant="outline"
@@ -171,7 +213,7 @@ const ProjectList = () => {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid grid-cols-1 ${isMobile ? '' : 'sm:grid-cols-2 lg:grid-cols-3'} gap-4`}>
             {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
                 <CardHeader className="h-20 bg-gray-100"></CardHeader>
@@ -194,7 +236,7 @@ const ProjectList = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid grid-cols-1 ${isMobile ? '' : 'sm:grid-cols-2 lg:grid-cols-3'} gap-4`}>
             {filteredProjects.map((project) => (
               <Card
                 key={project.id}
