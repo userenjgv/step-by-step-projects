@@ -32,6 +32,6 @@ export function useIsMobile() {
     return () => mql.removeEventListener("change", onChange)
   }, [])
 
-  // Return just the boolean value instead of an object to match the type expected by sidebar.tsx
+  // Return just the boolean value to match the type expected by sidebar.tsx
   return isMobile || isNativeMobile;
 }

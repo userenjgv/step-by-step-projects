@@ -6,6 +6,9 @@ import { Storage } from '@capacitor/storage';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+console.log('Supabase URL:', supabaseUrl);
+console.log('Supabase Anon Key:', supabaseAnonKey ? 'Present' : 'Missing');
+
 // Check if the environment variables are set
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase environment variables are missing. Please check your .env file or set them in your environment.');
@@ -49,8 +52,6 @@ const supabaseOptions = {
 };
 
 // Create a single supabase client for the entire application
-// If environment variables are missing, create a client with placeholder values
-// that will show proper errors in the console
 const supabase = createClient(
   supabaseUrl || 'https://placeholder-url.supabase.co', 
   supabaseAnonKey || 'placeholder-key',
@@ -60,6 +61,8 @@ const supabase = createClient(
 // Initialize the documents bucket if it doesn't exist
 const initializeStorage = async () => {
   try {
+    console.log('Attempting to initialize storage...');
+    
     // Check if the bucket exists
     const { data: buckets, error } = await supabase.storage.listBuckets();
     
@@ -68,11 +71,13 @@ const initializeStorage = async () => {
       return;
     }
 
+    console.log('Existing buckets:', buckets);
+
     // If the documents bucket doesn't exist, create it
     const documentsBucketExists = buckets?.some(bucket => bucket.name === 'documents');
     
     if (!documentsBucketExists) {
-      console.log('Creating documents storage bucket...');
+      console.log('Documents bucket does not exist. Creating...');
       const { error: createError } = await supabase.storage.createBucket('documents', {
         public: true,
         fileSizeLimit: 10485760, // 10MB
